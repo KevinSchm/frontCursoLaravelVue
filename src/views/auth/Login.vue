@@ -12,8 +12,11 @@
 
 <script setup>
 import {ref} from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
-import AuthService from "@/service/AuthService"
+import authService from "@/service/AuthService"
+
+    const router = useRouter()
 
     const usuario = ref({
         email: "",
@@ -21,7 +24,22 @@ import AuthService from "@/service/AuthService"
     })
     const loginConLaravel = async () => {
         //const res = await axios.post('http://127.0.0.1:8000/api/v1/auth/login', usuario.value)
-        const res = await AuthService.loginConLaravel(usuario.value)
-        console.log(res.data)
+        try {
+            const res = await authService.loginConLaravel(usuario.value)
+            console.log(res.data)
+
+            if(res.data.error){
+                alert(res.data.message)
+            }
+            else{
+                localStorage.setItem("access_token", res.data.access_token);
+                //alert("Autenticado")
+                router.push({name: "Perfil"})
+            }
+            
+        } catch (error) {
+            alert("Error al autenticar")
+        }
+        
     }
 </script>
